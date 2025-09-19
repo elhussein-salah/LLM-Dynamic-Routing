@@ -32,8 +32,11 @@ public class ModelRouter {
             return new RouteResult(simple.answer(query), "SIMPLE");
         } else if (decision.contains("MEDIUM")) {
             return new RouteResult(medium.answer(query), "MEDIUM");
-        } else  {
+        } else if (decision.contains("ADVANCED"))  {
             return new RouteResult(advanced.answer(query), "ADVANCED");
+        }
+        else{
+            return new RouteResult(medium.answer(query), "MEDIUM");
         }
     }
 }

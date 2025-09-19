@@ -1,17 +1,29 @@
 package org.myapp;
+import fi.iki.elonen.NanoHTTPD;
+import models.AdvancedModel;
+import models.MediumModel;
+import models.SimpleModel;
+import router.RouterChainFactory;
+import web.WebServer;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import java.io.IOException;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+class Main {
+
+    public static void main(String[] args) throws IOException {
+
+        String ollamaBaseUrl = "http://localhost:11434";
+        SimpleModel simple = new SimpleModel(ollamaBaseUrl, "gemma3:1b-it-q4_K_M");
+        MediumModel medium = new MediumModel(ollamaBaseUrl, "gemma3:1b");
+        AdvancedModel advanced = new AdvancedModel(ollamaBaseUrl, "gemma3:1b-it-fp16");
+        RouterService service = new RouterService(
+                RouterChainFactory.createRouterChain(ollamaBaseUrl, "gemma3:1b", simple, medium, advanced),
+                cache.CaffeineCacheManager.getInstance(1000, 3600)
+        );
+
+        WebServer server = new WebServer(9090, service);
+        server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+        System.out.println("Server running at http://localhost:9090");
     }
+
 }
